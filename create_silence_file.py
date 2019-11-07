@@ -11,22 +11,21 @@ required_args.add_argument(
 optional_args=parser.add_argument_group('optional arguments')
 optional_args.add_argument('-db', default=[5], nargs=1, type=int, help='Threshold decibel level')
 optional_args.add_argument('-sl', default=[300], nargs=1, type=int, help='Min. silence length(secs)')
+optional_args.add_argument('-add_info', action='store_true', help='Add additional info: filesetid,bookname,chapter number')
 
 args = parser.parse_args()
 input_audio_file=args.i[0]
 output_silence_file=args.o[0]
 decibels=args.db[0]
 min_sil_len=args.sl[0]
+add_info=args.add_info
+
 
 
 import pydub.silence as sil,os,re
 from pydub import AudioSegment
 
-filename=input_audio_file.split('/')[-1]
-input=re.compile('\_+').split(filename.split('.')[0])
-file_setid=input[-1]
-book_name=input[-2]
-chapter_num=input[-3]
+
 
 sound = AudioSegment.from_mp3(input_audio_file)
 dBFS = sound.dBFS
@@ -34,11 +33,17 @@ silence_boundaries = sil.detect_silence(sound, min_silence_len=min_sil_len, sile
 if os.path.exists(output_silence_file): os.remove(output_silence_file)
 silence_file=open(output_silence_file,'w')
 
-#Add 4 lines
-silence_file.write('# -'+str(decibels)+'\n')
-silence_file.write(file_setid + '\n')
-silence_file.write(book_name + '\n')
-silence_file.write(chapter_num + '\n')
+#Add 4 lines if add_info is True
+if add_info:
+    filename=input_audio_file.split('/')[-1]
+    input=re.compile('\_+').split(filename.split('.')[0])
+    file_setid=input[-1]
+    book_name=input[-2]
+    chapter_num=input[-3]
+    silence_file.write('# -'+str(decibels)+'\n')
+    silence_file.write(file_setid + '\n')
+    silence_file.write(book_name + '\n')
+    silence_file.write(chapter_num + '\n')
 
 line_inc=0
 for boundaries in silence_boundaries:
