@@ -41,9 +41,7 @@ if add_info:
     book_name=input[-2]
     chapter_num=input[-3]
     silence_file.write('# -'+str(decibels)+'\n')
-    silence_file.write(file_setid + '\n')
-    silence_file.write(book_name + '\n')
-    silence_file.write(chapter_num + '\n')
+    silence_file.write(file_setid + '\n'+book_name + '\n'+chapter_num + '\n')
 
 line_inc=0
 for boundaries in silence_boundaries:
