@@ -20,6 +20,7 @@ add_info=args.add_info
 read_file=open(input_cue_file,'r')
 write_file=open(output_cue_file,'w')
 
+#Add 4 lines if add_info is True
 if add_info:
     filename = input_cue_file.split('/')[-1]
     input = re.compile('\_+').split(filename.split('.')[0])
