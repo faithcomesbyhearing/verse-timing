@@ -41,7 +41,7 @@ In core script it says +2 secs, its duration in clt is 1.66 secs'''
 
 while line_number_id<=len(lines):
 
-    start_time=float(lines[start_time_id].strip())/bits_per_second
+    start_time=round(float(lines[start_time_id].strip())/bits_per_second,3)
     line_audio_file = (lines[line_number_id]).strip()
     line_number=(re.compile('\_+').split(line_audio_file.split('.')[0]))[-1]
     write_file.write(str(start_time)+','+str(line_number)+'\n')
