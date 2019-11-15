@@ -163,18 +163,7 @@ def get_chapter_phrases(book_chapter,target_language_column_index,script_df):
             elif i==0:
                 verse_num_list.append(current_verse_num)
 
-
-
         print("line_number:{0},line_content:{1},verses_in_current_line:{4},postSilence:{2},do_not_combine_flag:{3}".format(line_num,script_df[target_column_name][index],postSilence,do_not_combine_boolean_flag,verse_num_list))
-
-
-        # limit=len(line_content)-1
-        # for i,v in enumerate(verse_num_list):
-        #     if verse_num_list[i+1]<=limit:
-        #         mark_words[v]=line_content[verse_ind_list[i]+1:verse_ind_list[i+1]-1]
-        #     else:
-        #         mark_words[v] = line_content[verse_ind_list[i] + 1:limit]
-        # print(mark_words)
 
 
 
