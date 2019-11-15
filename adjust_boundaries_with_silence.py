@@ -1,4 +1,4 @@
-def adjust_boundaries_with_silence(input_file,silence_file,output_file,input_split_field='\t',silence_split_field=',',output_split_field=','):
+def adjust_boundaries_with_silence(input_file,silence_file,output_file,input_split_field=',',silence_split_field=',',output_split_field=','):
     #This function adjusts the boundaries of input file with silence mid points
     inc=0
     new0=list()
