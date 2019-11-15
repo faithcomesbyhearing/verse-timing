@@ -18,6 +18,8 @@ def adjust_boundaries_with_silence(input_file,silence_file,output_file,input_spl
                     for silence_bounds in s:
                         silence_start=float(silence_bounds.split(silence_split_field)[0])
                         silence_end=float(silence_bounds.split(silence_split_field)[1])
+
+                        #if boundary falls inside silence, move it to silence region mid point
                         if silence_start<=adjust_boundary1<=silence_end:
                             adjust_boundary1=(silence_start+silence_end)/2
                             break
