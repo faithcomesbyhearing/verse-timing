@@ -33,9 +33,9 @@ input=re.compile('\_+').split(filename.split('.')[0])
 if args.fileset is not None:file_setid=args.fileset[0]
 else:file_setid=input[1]+input[0]
 if args.book is not None: book_name=args.book[0]
-else:book_name=input[-2]
+else:book_name=input[-3]
 if args.chapter is not None:chapter_num=args.chapter[0]
-else:chapter_num=input[-3]
+else:chapter_num=input[-2]
 
 # Adjust decoding patterm in .clt
 lines=read_file.readlines()
