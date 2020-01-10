@@ -27,7 +27,8 @@ required_args.add_argument('-fileset', nargs=1, type=str,default=['test'],help='
 
 optional_args=parser.add_argument_group('optional arguments')
 optional_args.add_argument('-sheetname', nargs=1, default=[0],type=int,help='sheetname or # in corescript')
-#optional_args.add_argument('-book_chapter', nargs=1, type=str, default=['MATTHEW 1'],help='custom book chapter. Be sure to include the space. EX: John 9')
+optional_args.add_argument('-book', nargs=1, type=str,help='custom book.EX: Mark')
+optional_args.add_argument('-book_chapter', nargs=1, type=str, default=['MATTHEW 1'],help='custom book chapter. Be sure to include the space. EX: John 9')
 optional_args.add_argument('-noheader', action='store_true', help='Remove header: fileset,book,chapter,db,sId,sBegin,sEnd')
 optional_args.add_argument('-find_string', nargs=1, type=str,default=['MATTHEW CHP 1'],help='string to find input langauge column index in corescript. Default:MATTHEW CHP 1')
 optional_args.add_argument('-target_pointer', nargs=1, type=str,default='2',help='Integer to add to input language column index to get target language in corescript. '
@@ -44,6 +45,9 @@ fileset=args.fileset[0]
 
 core_script_sheet_name=args.sheetname[0]
 #if args.book_chapter is not None: book_chapter=args.book_chapter[0]
+if args.book is not None:
+    book=args.book[0]
+else:book=None
 find_string=args.find_string[0]
 target_pointer=int(args.target_pointer[0])
 line_num_pointer=args.line_pointer
@@ -63,6 +67,9 @@ if not(args.noheader):write_file.writerow(('fileset','book','chapter','line_numb
 
 # Get the first column index of line numbers, input language, target language and corescript dataframe
 def get_column_indexes_from_corescript(input_file=input_file,core_script_sheet_name=core_script_sheet_name,find_string=find_string,target_pointer=target_pointer):
+    line_column_index=8
+    input_language_column_index=10
+    target_language_column_index=12
     # Open read and write files
     df = (pd.read_excel(input_file, sheet_name=core_script_sheet_name, encoding='utf-8')).astype(str)
     for c in range(0,len(df.columns)):
@@ -92,13 +99,22 @@ def range1(start, end):
     return range(start, end+1)
 
 
-def get_book_chapters_list(chapter_find_string,input_language_column_index,target_language_column_index,df):
+def get_book_chapters_list(chapter_find_string,input_language_column_index,target_language_column_index,df,custom_book=None):
     #Detect language
     language=detect(script_df.iloc[500,target_language_column_index])
+    tmp_book_chapters_list=list()
     book_chapters_list=list()
-    for s in df[(df.iloc[:, input_language_column_index].str).contains(chapter_find_string) == True].iloc[:, 10]:
+    for s in df[(df.iloc[:, input_language_column_index].str).contains(chapter_find_string) == True].iloc[:, input_language_column_index]:
         book_list=s.split('\n')[-1]
-        book_chapters_list.append(book_list)
+        tmp_book_chapters_list.append(book_list)
+
+    if custom_book is not None:
+        custom_book=custom_book.upper()
+        for i,b in enumerate(tmp_book_chapters_list):
+            book_upper=b.upper()
+            if (book_upper.__contains__(custom_book)):
+                book_chapters_list.append(b)
+    else:book_chapters_list=tmp_book_chapters_list
     return language,book_chapters_list
 
 
@@ -202,7 +218,7 @@ def get_chapter_verses(language,input_book_chapter,output_book_chapter,target_la
 
         if language == 'en':write_string = [str(i).encode("ascii", errors="ignore").decode() for i in write_string]
         else:write_string = [str(i) for i in write_string]
-        write_file.writerow(write_string)
+        if word.strip()!='':  write_file.writerow(write_string)
 
     # For each line in chapter process and print the same info. as above
     for index in range1(line_start_index+1,line_end_index):
@@ -326,7 +342,7 @@ def get_chapter_verses(language,input_book_chapter,output_book_chapter,target_la
                 write_string = [str(i).encode("ascii", errors="ignore").decode() for i in write_string]
             else:
                 write_string = [str(i) for i in write_string]
-            write_file.writerow(write_string)
+            if (verse_list_dict[v]).strip()!='': write_file.writerow(write_string)
 
 
 
@@ -336,17 +352,25 @@ def get_chapter_verses(language,input_book_chapter,output_book_chapter,target_la
 
 
 line_column_index,input_language_column_index,target_language_column_index,script_df=get_column_indexes_from_corescript()
-# print(target_language_column_index)
+# print(line_column_index,input_language_column_index,target_language_column_index)
 print("line_column_name:{0},input_language_column_name:{1},target_language_column_name:{2}".format(script_df.columns[line_column_index],script_df.columns[input_language_column_index],script_df.columns[target_language_column_index]))
 
-language,book_chapters_list=get_book_chapters_list(chapter_find_string,input_language_column_index,target_language_column_index,script_df)
+language,complete_book_chapters_list=get_book_chapters_list(chapter_find_string,input_language_column_index,target_language_column_index,script_df)
+language,book_chapters_list=get_book_chapters_list(chapter_find_string,input_language_column_index,target_language_column_index,script_df,book)
 
+print(complete_book_chapters_list)
+print(book_chapters_list)
+print(language)
+
+last_chapter_index=[i+1 for i, x in enumerate(complete_book_chapters_list) if x==book_chapters_list[len(book_chapters_list)-1]][0]
 
 for i,book in enumerate(book_chapters_list):
     print(book)
-
-    if i!=len(book_chapters_list)-1:
-        get_chapter_verses(language,book,book_chapters_list[i+1],target_language_column_index,script_df)
+    if i != len(book_chapters_list) - 1:
+        get_chapter_verses(language, book, book_chapters_list[i + 1], target_language_column_index, script_df)
     else:
-        get_chapter_verses(language, book, 'REVELATION CHP 23', target_language_column_index, script_df)
+        if book is None:
+            get_chapter_verses(language, book, 'REVELATION CHP 23', target_language_column_index, script_df)
+        else:
+            get_chapter_verses(language, book, complete_book_chapters_list[last_chapter_index], target_language_column_index, script_df)
 write_file_handle.close()

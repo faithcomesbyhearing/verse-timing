@@ -36,5 +36,6 @@ Example run:
 adjust_boundaries_with_silence('/mark1_test/N2_ESV_ESV_029_MRK_01_VOX_edited.txt','/mark1_test/silence_boundaries_use_file.txt',
                                '/mark1_test/test.txt',input_split_field=',',silence_split_field=',',output_split_field=',')
 Check out the result_adjust_boundaries_with_silence.png for a sample result of what this function does
+
 '''
 
