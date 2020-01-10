@@ -11,7 +11,7 @@ required_args.add_argument(
 
 optional_args=parser.add_argument_group('optional arguments')
 optional_args.add_argument('-db', default=[5], nargs=1, type=int, help='Threshold decibel level')
-optional_args.add_argument('-sl', default=[300], nargs=1, type=int, help='Min. silence length(secs)')
+optional_args.add_argument('-sl', default=[500], nargs=1, type=int, help='Min. silence length(milli secs)')
 optional_args.add_argument('-fileset', nargs=1, type=str,help='custom fileset id')
 optional_args.add_argument('-book', nargs=1, type=str, help='custom book id')
 optional_args.add_argument('-chapter', nargs=1, type=str,help='custom chapter id')
