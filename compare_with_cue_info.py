@@ -153,7 +153,7 @@ for each_chapter in chapter_list:
     target1_list = df[target1][df['chapter'] == str(each_chapter)]
     uniq1_target = target1_list.unique()
     if args.write_audition_format:
-        audition_file_name = (aeneas_chapter_file.split('/')[-1]).split('_sync_adjusted.txt')[0] + target.split('_')[0]+'_audition_markers.csv'
+        audition_file_name = (aeneas_chapter_file.split('/')[-1]).split('_sync_adjusted.txt')[0] + target1.split('_')[0]+'_audition_markers.csv'
         #print(aeneas_chapter_file.split('/')[-1],(aeneas_chapter_file.split('/')[-1]).split('_sync_adjusted.txt')[0],audition_file_name)
         audition_file = input_dir + '/' + audition_file_name
 
@@ -167,7 +167,7 @@ for each_chapter in chapter_list:
         for each_target in uniq1_target:
             ind+=1
 
-            indices=[i for i,val in enumerate(target_list) if val==each_target]
+            indices=[i for i,val in enumerate(target1_list) if val==each_target]
             aeneas_duration = 0
 
             counter=0
@@ -188,12 +188,16 @@ for each_chapter in chapter_list:
 
             if ind==1:
                 # Write to adobe audition file
+                print(marker_name + str(each_target) + '\t' + '0:' + str(round(aud_start, 3)) + '\t' + '0:' + str(
+                    round(aud_duration, 3)) + '\t' + 'decimal' + '\t' + 'Cue' + '\t' +aud_text+'\n')
                 aud.write(
                     'Name' + '\t' + 'Start' + '\t' + 'Duration' + '\t' + 'Time Format' + '\t' + 'Type' + '\t' + 'Description' + '\n')
                 aud.write(marker_name + str(each_target) + '\t' + '0:' + str(round(aud_start, 3)) + '\t' + '0:' + str(
                     round(aud_duration, 3)) + '\t' + 'decimal' + '\t' + 'Cue' + '\t' +aud_text+'\n')
                 # print('aud text->',aud_text)
             else:
+                print(marker_name + str(each_target) + '\t' + '0:' + str(round(aud_start, 3)) + '\t' + '0:' + str(
+                    round(aud_duration, 3)) + '\t' + 'decimal' + '\t' + 'Cue' + '\t' +aud_text+'\n')
                 aud.write(marker_name + str(each_target) + '\t' + '0:' + str(round(aud_start, 3)) + '\t' + '0:' + str(
                     round(aud_duration, 3)) + '\t' + 'decimal' + '\t' + 'Cue' + '\t' +aud_text+'\n')
                 # print('aud text->', aud_text)
@@ -287,10 +291,3 @@ for c in range(1,len(chapter_list)+1):
              fontsize=10, ha='left')
     plt.hist(qc_data[g])
 plt.show()
-
-
-
-
-
-
-
