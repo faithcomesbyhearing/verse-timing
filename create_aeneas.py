@@ -3,6 +3,8 @@
 
 EX run:
 python3 create_aeneas.py -input_lines_csv /Users/spanta/Desktop/jon_code_test/upload_code/telugu_lines.csv -input_audio_dir /telugu_64_non_drama -o /telugu_aeneas -language_code eng
+
+Adjust code so that it can read any named audio mp3 or wav, instead of using sound find string
 '''
 
 
@@ -32,6 +34,9 @@ optional_args.add_argument('-noheader', action='store_true', help='Remove header
 optional_args.add_argument('-no_audacity_output', action='store_true', help='Remove header: fileset,book,chapter,line#,verse#,verse_content,time')
 optional_args.add_argument('-input_no_header', action='store_true', help='Indicate whether input lines.csv has header or not')
 optional_args.add_argument('-adjust_silence', action='store_true', help='Adjust boundaries with closest silence midpoint')
+optional_args.add_argument('-move_adjustment', action='store_true', help='Move time points as you adjust for silence')
+optional_args.add_argument('-write_audition_format', action='store_true', help='Write output to audition tab csv format')
+
 
 args = parser.parse_args()
 print(args)
@@ -40,6 +45,7 @@ input_file=args.input_lines_csv[0]
 input_audio_dir=args.input_audio_dir[0]
 output_dir=args.output_dir[0]
 language_code=args.language_code[0]
+sound_find_string=None
 if args.sound_find_string is not None: sound_find_string=args.sound_find_string[0]
 
 
@@ -51,7 +57,7 @@ write_file_handle=open(output_file,'w',encoding='utf-8')
 write_file = csv.writer(write_file_handle)
 # Write header as requested by user
 if not(args.noheader):write_file.writerow(('fileset','book','chapter','line_number', 'verse_number','verse_content','time'))
-if args.adjust_silence:adjust_silence_flag=True
+
 
 book_chapter_list=list()
 def get_chapters_index(df):
@@ -102,6 +108,7 @@ def create_aeneas_csv(df=input_df,book_chapter_list=book_chapter_list,input_audi
 
         if sound_find_string is not None:find_audio_string=sound_find_string+'_'+chapter
 
+        print(find_audio_string)
         chapter_audio=glob.glob(input_audio_dir+'/*'+find_audio_string+'*')[0]
         if not(chapter_audio):missing_chapters.append(each_chapter)
 
@@ -126,10 +133,10 @@ def create_aeneas_csv(df=input_df,book_chapter_list=book_chapter_list,input_audi
 
 
         # create Task object
-        aeneas_output_file=(chapter_audio.split('/')[-1]).split('.')[0]+'_aeneas_out.aud'
+        aeneas_output_file=(chapter_audio.split('/')[-1]).split('.')[0]+'_aeneas_out.txt'
         config_string = f"task_language={language_code}|is_text_type=plain|os_task_file_format=aud"
 
-        # Save .aud file
+        # Save .txt file
         ExecuteTaskCLI(use_sys=False).run(arguments=[
             None,  # dummy program name argument
             chapter_audio,
@@ -155,17 +162,28 @@ def create_aeneas_csv(df=input_df,book_chapter_list=book_chapter_list,input_audi
 
 
         inc=0
+        verse_list=list()
         for i in range(0, len(df)):
             if (      (str(df['book'][i])).strip()      ).upper() == search_book.upper() and int(df['chapter'][i])==int(chapter):
                 write_file.writerow((df['fileset'][i],df['book'][i],df['chapter'][i],df['line_number'][i],df['verse_number'][i],df['verse_content'][i],index_list[inc]))
+                verse_list.append(df['verse_number'][i])
                 inc+=1
 
         print(chapter_audio)
 
-        if args.adjust_silence:
+        if args.move_adjustment:
+            silence_file = output_dir + '/' + (aeneas_output_file.split('/')[-1]).split('.')[0] + '_silence.txt'
+            extract_silence_intervals(chapter_audio, silence_file)
+            adjust_update_boundaries_with_silence(output_dir + '/' + aeneas_output_file, silence_file,
+                                           output_dir + '/' + (chapter_audio.split('/')[-1]).split('.')[
+                                               0] + '_sync_adjusted.txt', verse_list,input_split_field='\t', output_split_field='\t')
+
+        elif args.adjust_silence:
             silence_file=output_dir+'/'+(aeneas_output_file.split('/')[-1]).split('.')[0]+'_silence.txt'
             extract_silence_intervals(chapter_audio,silence_file)
-            adjust_boundaries_with_silence(output_dir+'/'+aeneas_output_file,silence_file,output_dir+'/'+(chapter_audio.split('/')[-1]).split('.')[0]+'_adjusted.aud',input_split_field='\t',output_split_field='\t')
+            adjust_boundaries_with_silence(output_dir+'/'+aeneas_output_file,silence_file,output_dir+'/'+(chapter_audio.split('/')[-1]).split('.')[0]+'_adjusted.txt',
+                                           verse_list,
+                                           input_split_field='\t',output_split_field='\t')
 
     write_file_handle.close()
 
@@ -183,7 +201,9 @@ def extract_silence_intervals(input_file,output_file,decibels=5,min_sil_len=500)
     if os.path.exists(output_file): os.remove(output_file)
     write_file = open(output_file, 'w')
 
-    sound = AudioSegment.from_wav(input_file)
+    if input_file.split('.')[-1]=='mp3':sound=AudioSegment.from_mp3(input_file)
+    else:sound = AudioSegment.from_wav(input_file)
+
     dBFS = sound.dBFS
     silence_boundaries = sil.detect_silence(sound, min_silence_len=min_sil_len, silence_thresh=dBFS - decibels)
 
@@ -194,7 +214,7 @@ def extract_silence_intervals(input_file,output_file,decibels=5,min_sil_len=500)
     write_file.close()
 
 
-def adjust_boundaries_with_silence(input_file,silence_file,output_file,input_split_field=',',silence_split_field=',',output_split_field=','):
+def adjust_boundaries_with_silence(input_file,silence_file,output_file,verse_list,input_split_field=',',silence_split_field=',',output_split_field=','):
     #This function adjusts the boundaries of input file with silence mid points
     inc=0
     new0=list()
@@ -205,7 +225,9 @@ def adjust_boundaries_with_silence(input_file,silence_file,output_file,input_spl
                 line=line.replace('\n','')
                 adjust_boundary0=float(line.split(input_split_field)[0])
                 adjust_boundary1 = float(line.split(input_split_field)[1])
-                if len(line.split(input_split_field))>2: text=output_split_field+line.split(input_split_field)[2]
+                # if len(line.split(input_split_field))>2: text=output_split_field+line.split(input_split_field)[2]
+                if len(line.split(input_split_field)) > 2:
+                    text =line.split(input_split_field)[2]
                 else:text=''
                 inc += 1
 
@@ -222,13 +244,87 @@ def adjust_boundaries_with_silence(input_file,silence_file,output_file,input_spl
                 s.close()
                 new0.append(adjust_boundary1)
                 #Write to output file
-                if inc==1:up.write(str(round(adjust_boundary0,3))+output_split_field+str(round(adjust_boundary1,3))+text+'\n')
-                else:up.write(str(round(new0[inc-2],3))+output_split_field+str(round(adjust_boundary1,3))+text+'\n')
+                if inc==1:up.write(str(round(adjust_boundary0,3))+output_split_field+str(round(adjust_boundary1,3))+output_split_field+str(verse_list[inc-1])+text+'\n')
+                else:up.write(str(round(new0[inc-2],3))+output_split_field+str(round(adjust_boundary1,3))+output_split_field+str(verse_list[inc-1])+text+'\n')
         up.close()
     f.close()
 
 
+def adjust_update_boundaries_with_silence(input_file,silence_file,output_file,verse_list,input_split_field=',',silence_split_field=',',output_split_field=','):
+    #This function adjusts the boundaries of input file with silence mid points
+    inc=0
+    new0=list()
+#     old=list()
+#
+#     with open(input_file, 'r') as f:
+#         for line in f:
+#             line = line.replace('\n', '')
+#             bound0 = float(line.split(input_split_field)[0])
+#             bound1 = float(line.split(input_split_field)[1])
+#             if len(line.split(input_split_field)) > 2: text = output_split_field + line.split(input_split_field)[2]
+#             else:text=''
+#             old.append(['{0} {1} {2}'.format(bound0,bound1,text)])
+#
+# #convert old to int
 
+
+
+    move_time=0
+    if args.write_audition_format:
+        audition_file_name = (output_file.split('/')[-1]).split('_sync_adjusted.txt')[0] + '_audition_markers.csv'
+        #print(aeneas_chapter_file.split('/')[-1],(aeneas_chapter_file.split('/')[-1]).split('_sync_adjusted.txt')[0],audition_file_name)
+        audition_file = output_dir + '/' + audition_file_name
+        marker_name='A_Marker_'
+
+    with open(input_file,'r') as f:
+        with open(audition_file, 'w') as aud:
+            with open(output_file,'w') as up:
+
+                    #Read input file
+                    for line in f:
+                        line=line.replace('\n','')
+                        adjust_boundary0=float(line.split(input_split_field)[0])
+                        adjust_boundary1 = float(line.split(input_split_field)[1])+move_time
+                        # if len(line.split(input_split_field))>2: text=output_split_field+line.split(input_split_field)[2]
+                        if len(line.split(input_split_field)) > 2:
+                            text =line.split(input_split_field)[2]
+                        else:text=''
+                        inc += 1
+
+                        #Read silence file
+                        with open(silence_file,'r') as s:
+                            for silence_bounds in s:
+                                silence_start=float(silence_bounds.split(silence_split_field)[0])
+                                silence_end=float(silence_bounds.split(silence_split_field)[1])
+
+                                #if boundary falls inside silence, move it to silence region mid point
+                                if silence_start<=adjust_boundary1<=silence_end:
+                                    adjust_boundary1=(silence_start+silence_end)/2
+                                    move_time+=((silence_start+silence_end)/2)-adjust_boundary1
+                                    break
+                        s.close()
+                        new0.append(adjust_boundary1)
+                        #Write to output file
+                        # print(str(verse_list[inc-1])+text)
+
+                        if inc==1:
+                            up.write(str(round(adjust_boundary0,3))+output_split_field+str(round(adjust_boundary1,3))+output_split_field+str(verse_list[inc-1])+text+'\n')
+
+                            aud.write(
+                                'Name' + '\t' + 'Start' + '\t' + 'Duration' + '\t' + 'Time Format' + '\t' + 'Type' + '\t' + 'Description' + '\n')
+
+                            aud.write(marker_name + str(verse_list[inc-1]) + '\t' + '0:' + str(round(adjust_boundary0,3)) + '\t' + '0:' + str(round(adjust_boundary1-adjust_boundary0,3)) + '\t'
+                                      + 'decimal' + '\t' + 'Cue' + '\t' + str(verse_list[inc-1])+text + '\n')
+                        else:
+                            up.write(str(round(new0[inc-2],3))+output_split_field+str(round(adjust_boundary1,3))+output_split_field+str(verse_list[inc-1])+text+'\n')
+
+                            aud.write(marker_name + str(verse_list[inc-1]) + '\t' + '0:' + str(round(new0[inc-2],3)) + '\t' + '0:' + str(round(adjust_boundary1-new0[inc-2],3)) + '\t'
+                                      + 'decimal' + '\t' + 'Cue' + '\t' + str(verse_list[inc-1])+text + '\n')
+
+        aud.close()
+
+        up.close()
+    f.close()
 
 
 create_aeneas_csv()

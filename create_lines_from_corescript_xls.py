@@ -31,9 +31,9 @@ optional_args.add_argument('-book', nargs=1, type=str,help='custom book.EX: Mark
 optional_args.add_argument('-book_chapter', nargs=1, type=str, default=['MATTHEW 1'],help='custom book chapter. Be sure to include the space. EX: John 9')
 optional_args.add_argument('-noheader', action='store_true', help='Remove header: fileset,book,chapter,db,sId,sBegin,sEnd')
 optional_args.add_argument('-find_string', nargs=1, type=str,default=['MATTHEW CHP 1'],help='string to find input langauge column index in corescript. Default:MATTHEW CHP 1')
-optional_args.add_argument('-target_pointer', nargs=1, type=str,default='2',help='Integer to add to input language column index to get target language in corescript. '
+optional_args.add_argument('-target_pointer', nargs=1, type=str,default=['2'],help='Integer to add to input language column index to get target language in corescript. '
                                                                                  'Default: find_string column index + 2')
-optional_args.add_argument('-line_pointer', nargs=1, type=int,default='-2',help='Integer to add to input language column index to get line number in corescript. '
+optional_args.add_argument('-line_pointer', nargs=1, type=str,default=['-2'],help='Integer to add to input language column index to get line number in corescript. '
                                                                                 'Default: find_string column index - 2')
 
 
@@ -49,8 +49,10 @@ if args.book is not None:
     book=args.book[0]
 else:book=None
 find_string=args.find_string[0]
+# if args.target_pointer is not None:
 target_pointer=int(args.target_pointer[0])
-line_num_pointer=args.line_pointer
+# if args.line_pointer is not None:
+line_num_pointer=int(args.line_pointer[0])
 
 #custom tags
 combine_tag='DO NOT COMBINE'
