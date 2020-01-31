@@ -279,7 +279,7 @@ for each_chapter in chapter_list:
                                 silence_end=float(silence_bounds.split(silence_split_field)[1])
 
                                 #if boundary falls inside silence, move it to silence region mid point
-                                if silence_end-silence_start>=0.45 and silence_start<=adjust_boundary1<=silence_end:
+                                if silence_end-silence_start>=0.45 and silence_start<=adjust_boundary1<=silence_end and adjust_boundary1>aud_start:
                                     adjust_boundary1=(silence_start+silence_end)/2
                                     aud_start=adjust_boundary1
                                     delta=aud_start-adjust_boundary1
@@ -297,13 +297,13 @@ for each_chapter in chapter_list:
                     'Name' + '\t' + 'Start' + '\t' + 'Duration' + '\t' + 'Time Format' + '\t' + 'Type' + '\t' + 'Description' + '\n')
                 aud.write(marker_name + str(each_target) + '\t' + '0:' + str(round(aud_start, 3)) + '\t' + '0:' + str(
                     round(aud_duration, 3)) + '\t' + 'decimal' + '\t' + 'Cue' + '\t' +aud_text+'\n')
-                # print('aud text->',aud_text)
+
             else:
 
                 # print(aud_start)
                 aud.write(marker_name + str(each_target) + '\t' + '0:' + str(round(aud_start, 3)) + '\t' + '0:' + str(
                     round(aud_duration, 3)) + '\t' + 'decimal' + '\t' + 'Cue' + '\t' +aud_text+'\n')
-                # print('aud text->', aud_text)
+
 
 
 
@@ -336,9 +336,9 @@ for each_chapter in chapter_list:
 
             # if each_chapter==print_chapter:
             #     print(each_chapter, verse_num, current_verse_start_time, current_verse_end_time, next_verse_start_time)
+            delta = next_verse_start_time - current_verse_end_time
+            if next_verse_start_time!=current_verse_end_time and delta>0:
 
-            if next_verse_start_time!=current_verse_end_time:
-                delta=next_verse_start_time-current_verse_end_time
                 if delta>60: print(each_chapter,verse_num,delta,current_verse_start_time,current_verse_end_time,next_verse_start_time,"CHECK delta is >60")
                 new_current_verse_duration=current_verse_duration+delta
 
@@ -350,10 +350,10 @@ for each_chapter in chapter_list:
 
                 aud_df['Duration'][i-1]=new_current_verse_duration
                 if each_chapter==print_chapter:
-                    print(each_chapter,current_verse_duration,aud_df['Duration'][i-1])
+                    print(each_chapter,delta,current_verse_duration,aud_df['Duration'][i-1])
     if each_chapter==print_chapter:
         print(aud_df['Duration'])
-    aud_df.to_csv(audition_file,encoding='utf-8',sep='\t')
+    aud_df.to_csv(audition_file,encoding='utf-8',sep='\t',index=False)
 
 
 
