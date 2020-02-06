@@ -1,5 +1,11 @@
 import pandas as pd,argparse,glob,statistics as stat,matplotlib.pyplot as plt,numpy as np,operator
 
+'''
+ex:
+python3 upload_code/compare_with_cue_info_chinanteco.py -i /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/lang_code_epo -o /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas -book_find_string MRC -synced_silence -write_audition_format -print_chapter 3 -extract_verse_timing
+
+'''
+
 #Make sure for chinanteco line comparison the cue info first liine is taken care of
 
 parser = argparse.ArgumentParser(
@@ -238,16 +244,38 @@ for each_chapter in chapter_list:
     with open(audition_file,'w') as aud:
         # Since we cant read cue info last verse, we will remove the last element from uniq_target
         # uniq_target=uniq_target[:-1]
+
         for each_target in uniq1_target:
             ind+=1
 
             indices=[i for i,val in enumerate(target1_list) if val==each_target]
+
+
+            #Find the next verse index
+            for k,kval in enumerate(target1_list):
+                if int(kval)==(int(each_target)+1):
+                    next_verse_index=k
+                    break
+
+                # Find the previous verse index
+            for k, kval in enumerate(target1_list):
+                if int(kval) == (int(each_target) - 1):
+                    previous_verse_index = k
+                    break
+
+
+
+            # if each_chapter==print_chapter:
+            #     print(int(each_target)+1,next_verse_index)
+
             aeneas_duration = 0
 
             counter=0
             aud_duration=0
             aud_text=''
-            for each_index in indices:
+
+
+            for g,each_index in enumerate(indices):
                 aeneas_times = ((aeneas_target[each_index]).strip('\n')).split('\t')
                 aeneas_duration += float(aeneas_times[1]) - float(aeneas_times[0])
                 aud_duration=aeneas_duration
@@ -255,21 +283,31 @@ for each_chapter in chapter_list:
 
                 if counter==0:
                     aeneas_start=float(((aeneas_target[each_index]).strip('\n')).split('\t')[0])
+
+                    # aeneas_start_next=float(((aeneas_target[each_index+1]).strip('\n')).split('\t')[0])
+
                     aud_start=aeneas_start
 
 
                     if ind>1 and (float(target2_list.iloc[each_index])-float(target2_list.iloc[each_index-1]))==1 :
 
+                        if each_chapter==print_chapter:
+                            print(each_target,target2_list.iloc[each_index])
+
                         #Get adjustboundary1
                         for i,each_line in enumerate(uniq2_target):
                             if each_line==target2_list.iloc[each_index]:
-                                if each_chapter==print_chapter:
-                                    print("chapter-{0},verse_num-{1},verse index-{2},line_num-{3}".format(each_chapter,each_target,each_index, float(target2_list.iloc[each_index])))
+                                # if each_chapter==print_chapter:
+                                #     print("chapter-{0},verse_num-{1},verse index-{2},line_num-{3}".format(each_chapter,each_target,each_index, float(target2_list.iloc[each_index])))
 
                                 adjust_boundary1=float((line_cue_target[i]).split('\t')[0])
                                 # if each_chapter==print_chapter:
                                 #     print(each_target, each_line,adjust_boundary1)
                                 break
+                        if each_chapter==print_chapter:
+                            aeneas_start_next = float(
+                                ((aeneas_target[next_verse_index]).strip('\n')).split('\t')[0])
+
 
                         #Read silence file
                         silence_split_field=','
@@ -279,12 +317,47 @@ for each_chapter in chapter_list:
                                 silence_end=float(silence_bounds.split(silence_split_field)[1])
 
                                 #if boundary falls inside silence, move it to silence region mid point
-                                if silence_end-silence_start>=0.45 and silence_start<=adjust_boundary1<=silence_end and adjust_boundary1>aud_start:
-                                    adjust_boundary1=(silence_start+silence_end)/2
-                                    aud_start=adjust_boundary1
-                                    delta=aud_start-adjust_boundary1
-                                    #aud_duration=aud_duration-delta
-                                    break
+
+
+
+                                if ind<len(aeneas_target):
+                                    aeneas_start_next = float(
+                                        ((aeneas_target[next_verse_index]).strip('\n')).split('\t')[0])
+
+                                    aeneas_start_previous=float(
+                                        ((aeneas_target[previous_verse_index]).strip('\n')).split('\t')[0])
+
+                                    if each_chapter==print_chapter and int(each_target)==14:
+                                        print(each_target, aeneas_start, int(each_target) + 1, aeneas_start_next)
+
+
+                                    # if each_chapter==print_chapter:
+                                    #     print('adjust_boundary1->{0},next_verse_start_time->{1},each_target_verse->{2}'.format(adjust_boundary1,aeneas_start_next,each_target))
+
+                                    if silence_end - silence_start >= 0.45 and silence_start <= adjust_boundary1 <= silence_end and aeneas_start_previous<adjust_boundary1 < aeneas_start_next :
+                                        #if each_chapter == print_chapter:
+                                            #print("chapter-{0},verse_num-{1},verse index-{2},line_num-{3}".format(
+                                                #each_chapter, each_target, each_index,
+                                                #float(target2_list.iloc[each_index])))
+                                            #print('hey its chapt 3', each_target, adjust_boundary1, aeneas_start_next)
+                                        adjust_boundary1 = (silence_start + silence_end) / 2
+                                        aud_start = adjust_boundary1
+                                        delta = aud_start - adjust_boundary1
+                                        # aud_duration=aud_duration-delta
+                                        break
+                                else:
+                                    if silence_end - silence_start >= 0.45 and silence_start <= adjust_boundary1 <= silence_end:
+                                        #if each_chapter == print_chapter:
+                                            #print("chapter-{0},verse_num-{1},verse index-{2},line_num-{3}".format(
+                                                #each_chapter, each_target, each_index,
+                                                #float(target2_list.iloc[each_index])))
+                                            #print('hey its chapt 3', each_target, adjust_boundary1, aeneas_start_next)
+                                        adjust_boundary1 = (silence_start + silence_end) / 2
+                                        aud_start = adjust_boundary1
+                                        delta = aud_start - adjust_boundary1
+                                        # aud_duration=aud_duration-delta
+                                        break
+
                         s.close()
 
                 counter += 1
@@ -337,7 +410,7 @@ for each_chapter in chapter_list:
             # if each_chapter==print_chapter:
             #     print(each_chapter, verse_num, current_verse_start_time, current_verse_end_time, next_verse_start_time)
             delta = next_verse_start_time - current_verse_end_time
-            if next_verse_start_time!=current_verse_end_time and delta>0:
+            if next_verse_start_time!=current_verse_end_time:
 
                 if delta>60: print(each_chapter,verse_num,delta,current_verse_start_time,current_verse_end_time,next_verse_start_time,"CHECK delta is >60")
                 new_current_verse_duration=current_verse_duration+delta
@@ -349,10 +422,11 @@ for each_chapter in chapter_list:
                     new_current_verse_duration = '0:' + str(new_current_verse_duration)
 
                 aud_df['Duration'][i-1]=new_current_verse_duration
-                if each_chapter==print_chapter:
-                    print(each_chapter,delta,current_verse_duration,aud_df['Duration'][i-1])
-    if each_chapter==print_chapter:
-        print(aud_df['Duration'])
+
+                if float(     (aud_df['Duration'][i]).split(':')[1]          )<0:
+                     print(each_chapter,delta,current_verse_duration,aud_df['Duration'][i-1])
+    #if each_chapter==print_chapter:
+        #print(aud_df['Duration'])
     aud_df.to_csv(audition_file,encoding='utf-8',sep='\t',index=False)
 
 
@@ -385,4 +459,4 @@ for c in range(1,len(chapter_list)+1):
     plt.text(0.5, 0.5, 'chap '+str(g)+' ,med=' + str(round(median_dict[g],2)) + ' ,std=' + str(round(std_dev_dict[g],2)),
              fontsize=10, ha='left')
     plt.hist(qc_data[g])
-# plt.show()
+#plt.show()
