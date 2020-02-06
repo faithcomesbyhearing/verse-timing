@@ -291,8 +291,8 @@ for each_chapter in chapter_list:
 
                     if ind>1 and (float(target2_list.iloc[each_index])-float(target2_list.iloc[each_index-1]))==1 :
 
-                        if each_chapter==print_chapter:
-                            print(each_target,target2_list.iloc[each_index])
+                        # if each_chapter==print_chapter:
+                        #     print(each_target,target2_list.iloc[each_index])
 
                         #Get adjustboundary1
                         for i,each_line in enumerate(uniq2_target):
@@ -327,8 +327,8 @@ for each_chapter in chapter_list:
                                     aeneas_start_previous=float(
                                         ((aeneas_target[previous_verse_index]).strip('\n')).split('\t')[0])
 
-                                    if each_chapter==print_chapter and int(each_target)==14:
-                                        print(each_target, aeneas_start, int(each_target) + 1, aeneas_start_next)
+                                    # if each_chapter==print_chapter and int(each_target)==14:
+                                    #     print(each_target, aeneas_start, int(each_target) + 1, aeneas_start_next)
 
 
                                     # if each_chapter==print_chapter:
@@ -410,10 +410,17 @@ for each_chapter in chapter_list:
             # if each_chapter==print_chapter:
             #     print(each_chapter, verse_num, current_verse_start_time, current_verse_end_time, next_verse_start_time)
             delta = next_verse_start_time - current_verse_end_time
+
+            if each_chapter==print_chapter:
+                print(each_verse,current_verse_end_time,next_verse_start_time)
+
+
             if next_verse_start_time!=current_verse_end_time:
 
                 if delta>60: print(each_chapter,verse_num,delta,current_verse_start_time,current_verse_end_time,next_verse_start_time,"CHECK delta is >60")
                 new_current_verse_duration=current_verse_duration+delta
+
+                new_current_verse_duration=round(new_current_verse_duration,3)
 
 
                 if new_current_verse_duration<10:
@@ -425,6 +432,8 @@ for each_chapter in chapter_list:
 
                 if float(     (aud_df['Duration'][i]).split(':')[1]          )<0:
                      print(each_chapter,delta,current_verse_duration,aud_df['Duration'][i-1])
+
+                #print(aud_df['Duration'][i])
     #if each_chapter==print_chapter:
         #print(aud_df['Duration'])
     aud_df.to_csv(audition_file,encoding='utf-8',sep='\t',index=False)
