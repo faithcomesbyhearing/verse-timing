@@ -5,7 +5,7 @@ Example code to run Chinanteco(in verification). Tested to work with input files
 python3 upload_code/create_lines_from_corescript_xls.py -i new_files/drive-download-20200107T220609Z-001/Chinanteco_San_Juan_Lealao_N2CLETBL/CORE_Scr_1059r_NT_1ENG__25_Rdr__Chinanteco_de_San_Juan_Lealao_N1_CLE_TBL.xls -o /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/chinanteco_lines.csv -book Mark 
 
 
-python3 upload_code/create_aeneas.py -input_lines_csv /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/chinanteco_lines.csv -input_audio_dir /Users/spanta/Desktop/jon_code_test/new_files/drive-download-20200107T220609Z-001/Chinanteco_San_Juan_Lealao_N2CLETBL -output_dir upload_code/chinanteco_aeneas/lang_code_epo -language_code epo -sound_find_string MRC -adjust_silence -write_audition_format
+python3 upload_code/create_aeneas.py -input_lines_csv /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/chinanteco_lines.csv -input_audio_dir /Users/spanta/Desktop/jon_code_test/new_files/drive-download-20200107T220609Z-001/Chinanteco_San_Juan_Lealao_N2CLETBL -output_dir upload_code/chinanteco_aeneas/lang_code_epo -language_code epo -sound_find_string MRC -move_adjustment -write_audition_format
 
 
 python3 upload_code/compare_with_cue_info_chinanteco.py -i /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/lang_code_epo -o /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas -book_find_string MRC -synced_silence -write_audition_format -print_chapter 3 -extract_verse_timing
