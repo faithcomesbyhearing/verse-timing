@@ -139,19 +139,24 @@ for each_chapter in chapter_list:
                 # if each_chapter==print_chapter: print(cue_start,aeneas_start)
 
                 if difference > float(args.check_secs[0]):
-                    marker_name = 'Check_A_Marker_'
+                    marker_name = 'Check Marker '
                 else:
-                    marker_name = 'A_Marker_'
+                    marker_name = 'Marker '
 
                 if ind==1:
                     # Write to adobe audition file
                     aud.write(
                         'Name' + '\t' + 'Start' + '\t' + 'Duration' + '\t' + 'Time Format' + '\t' + 'Type' + '\t' + 'Description' + '\n')
-                    aud.write(marker_name + str(each_target) + '\t' + '0:' + str(round(aud_start, 3)) + '\t' + '0:' + str(
+                    aud.write(marker_name + '0'+str(each_target) + '\t' + '0:' + str(round(aud_start, 3)) + '\t' + '0:' + str(
                         round(aud_duration, 3)) + '\t' + 'decimal' + '\t' + 'Cue' + '\t' +aud_text+'\n')
                     # print('aud text->',aud_text)
                 else:
-                    aud.write(marker_name + str(each_target) + '\t' + '0:' + str(round(aud_start, 3)) + '\t' + '0:' + str(
+
+                    if int(each_target)<10:marker_number='0'+str(each_target)
+                    else:marker_number=str(each_target)
+
+
+                    aud.write(marker_name + marker_number + '\t' + '0:' + str(round(aud_start, 3)) + '\t' + '0:' + str(
                         round(aud_duration, 3)) + '\t' + 'decimal' + '\t' + 'Cue' + '\t' +aud_text+'\n')
                     # print('aud text->', aud_text)
 
@@ -190,19 +195,25 @@ for each_chapter in chapter_list:
                     aud_start=aeneas_start
                 counter+=1
 
-            marker_name = 'A_Marker_'
+            marker_name = 'Marker '
 
             if ind==1:
                 # Write to adobe audition file
                 #print(marker_name + str(each_target) + '\t' + '0:' + str(round(aud_start, 3)) + '\t' + '0:' + str(round(aud_duration, 3)) + '\t' + 'decimal' + '\t' + 'Cue' + '\t' +aud_text+'\n')
                 aud.write(
                     'Name' + '\t' + 'Start' + '\t' + 'Duration' + '\t' + 'Time Format' + '\t' + 'Type' + '\t' + 'Description' + '\n')
-                aud.write(marker_name + str(each_target) + '\t' + '0:' + str(round(aud_start, 3)) + '\t' + '0:' + str(
+                aud.write(marker_name + '0'+str(each_target) + '\t' + '0:' + str(round(aud_start, 3)) + '\t' + '0:' + str(
                     round(aud_duration, 3)) + '\t' + 'decimal' + '\t' + 'Cue' + '\t' +aud_text+'\n')
                 # print('aud text->',aud_text)
             else:
+
+                if int(each_target) < 10:
+                    marker_number = '0' + str(each_target)
+                else:
+                    marker_number = str(each_target)
+
                 #print(marker_name + str(each_target) + '\t' + '0:' + str(round(aud_start, 3)) + '\t' + '0:' + str(round(aud_duration, 3)) + '\t' + 'decimal' + '\t' + 'Cue' + '\t' +aud_text+'\n')
-                aud.write(marker_name + str(each_target) + '\t' + '0:' + str(round(aud_start, 3)) + '\t' + '0:' + str(
+                aud.write(marker_name + marker_number + '\t' + '0:' + str(round(aud_start, 3)) + '\t' + '0:' + str(
                     round(aud_duration, 3)) + '\t' + 'decimal' + '\t' + 'Cue' + '\t' +aud_text+'\n')
                 # print('aud text->', aud_text)
 
@@ -362,19 +373,22 @@ for each_chapter in chapter_list:
 
                 counter += 1
 
-            marker_name = 'A_Marker_'
+            marker_name = 'Marker '
 
             if ind==1:
                 # Write to adobe audition file
                 aud.write(
                     'Name' + '\t' + 'Start' + '\t' + 'Duration' + '\t' + 'Time Format' + '\t' + 'Type' + '\t' + 'Description' + '\n')
-                aud.write(marker_name + str(each_target) + '\t' + '0:' + str(round(aud_start, 3)) + '\t' + '0:' + str(
+                aud.write(marker_name + '0'+str(each_target) + '\t' + '0:' + str(round(aud_start, 3)) + '\t' + '0:' + str(
                     round(aud_duration, 3)) + '\t' + 'decimal' + '\t' + 'Cue' + '\t' +aud_text+'\n')
 
             else:
-
+                if int(each_target) < 10:
+                    marker_number = '0' + str(each_target)
+                else:
+                    marker_number = str(each_target)
                 # print(aud_start)
-                aud.write(marker_name + str(each_target) + '\t' + '0:' + str(round(aud_start, 3)) + '\t' + '0:' + str(
+                aud.write(marker_name + marker_number + '\t' + '0:' + str(round(aud_start, 3)) + '\t' + '0:' + str(
                     round(aud_duration, 3)) + '\t' + 'decimal' + '\t' + 'Cue' + '\t' +aud_text+'\n')
 
 
