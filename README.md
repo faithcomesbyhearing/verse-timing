@@ -12,7 +12,7 @@ python3 upload_code/compare_with_cue_info_chinanteco.py -i /Users/spanta/Desktop
 
 
 
-The foll. cue info files are manually extracted from clt tool and written in text format
+The foll. cue info files are manually extracted from clt tool and written in text format. The code wont run if it can't find these files. 
 /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/lang_code_epo/N2.CLE.TBL.029.MRC.01_cue_info.txt
 /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/lang_code_epo/N2.CLE.TBL.030.MRC.02_cue_info.txt
 /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/lang_code_epo/N2.CLE.TBL.031.MRC.03_cue_info.txt
@@ -29,3 +29,18 @@ The foll. cue info files are manually extracted from clt tool and written in tex
 /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/lang_code_epo/N2.CLE.TBL.042.MRC.14_cue_info.txt
 /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/lang_code_epo/N2.CLE.TBL.043.MRC.15_cue_info.txt
 /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/lang_code_epo/N2.CLE.TBL.044.MRC.16_cue_info.txt
+
+
+
+Input files:
+ls /Users/spanta/Desktop/jon_code_test/new_files/drive-download-20200107T220609Z-001/Chinanteco_San_Juan_Lealao_N2CLETBL
+CORE_Scr_1059r_NT_1ENG__25_Rdr__Chinanteco_de_San_Juan_Lealao_N1_CLE_TBL.xls	N2_CLE_TBL_0037_MRC_09.wav
+N2_CLE_TBL_0029_MRC_01.wav							N2_CLE_TBL_0038_MRC_10.wav
+N2_CLE_TBL_0030_MRC_02.wav							N2_CLE_TBL_0039_MRC_11.wav
+N2_CLE_TBL_0031_MRC_03.wav							N2_CLE_TBL_0040_MRC_12.wav
+N2_CLE_TBL_0032_MRC_04.wav							N2_CLE_TBL_0041_MRC_13.wav
+N2_CLE_TBL_0033_MRC_05.wav							N2_CLE_TBL_0042_MRC_14.wav
+N2_CLE_TBL_0034_MRC_06.wav							N2_CLE_TBL_0043_MRC_15.wav
+N2_CLE_TBL_0035_MRC_07.wav							N2_CLE_TBL_0044_MRC_16.wav
+N2_CLE_TBL_0036_MRC_08.wav
+
