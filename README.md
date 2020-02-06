@@ -1,6 +1,6 @@
 # verse-timing
 Tools to determine the start time of verses in chapter audio files.
-Example code to run Chinanteco. Tested to work with input files naming convention on Mark gospel.
+Example code to run Chinanteco(in verification). Tested to work with input files naming convention on Mark gospel.
 
 python3 upload_code/create_lines_from_corescript_xls.py -i new_files/drive-download-20200107T220609Z-001/Chinanteco_San_Juan_Lealao_N2CLETBL/CORE_Scr_1059r_NT_1ENG__25_Rdr__Chinanteco_de_San_Juan_Lealao_N1_CLE_TBL.xls -o /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/chinanteco_lines.csv -book Mark 
 
