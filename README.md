@@ -8,8 +8,7 @@ python3 upload_code/create_lines_from_corescript_xls.py -i new_files/drive-downl
 python3 upload_code/create_aeneas.py -input_lines_csv /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/chinanteco_lines.csv -input_audio_dir /Users/spanta/Desktop/jon_code_test/new_files/drive-download-20200107T220609Z-001/Chinanteco_San_Juan_Lealao_N2CLETBL -output_dir upload_code/chinanteco_aeneas/lang_code_epo -language_code epo -sound_find_string MRC -move_adjustment -write_audition_format
 
 
-python3 upload_code/compare_with_cue_info_chinanteco.py -i /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/lang_code_epo -o /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas -book_find_string MRC -synced_silence -write_audition_format -print_chapter 3 -extract_verse_timing
-
+python3 upload_code/compare_with_cue_info_chinanteco.py -i /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/lang_code_epo -o /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/ -book_find_string MRC -synced_silence -write_audition_format -print_chapter 3 -extract_verse_timing
 
 
 The foll. cue info files are manually extracted from clt tool and written in text format. The code wont run if it can't find these files. 
