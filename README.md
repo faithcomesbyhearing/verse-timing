@@ -1,5 +1,5 @@
 # verse-timing
-Tools to determine the start time of verses in chapter audio files.Tested to work with input files naming convention on Mark gospel for Chinanteco and having line cue info markers text files as shown below.
+Tools to determine the start time of verses in chapter audio files.Tested to work with exact command line arguments, input files naming convention on Mark gospel for Chinanteco and having line cue info markers text files as shown below. 
 
 Example code to run Chinanteco. 
 
