@@ -11,7 +11,7 @@ python3 upload_code/create_aeneas.py -input_lines_csv /Users/spanta/Desktop/jon_
 python3 upload_code/compare_with_cue_info_chinanteco.py -i /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/lang_code_epo -o /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/ -book_find_string MRC -synced_silence -write_audition_format -print_chapter 3 -extract_verse_timing
 
 
-The foll. cue info files are manually extracted from clt tool and written in text format. The code wont run if it can't find these files. 
+The foll. cue info files are manually extracted from clt tool and written in text format. The code wont run if it can't find these files in the output dir. Please unzip "Chinanteco_cue_info_text_files.zip" uploaded to github as below.  
 /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/lang_code_epo/N2.CLE.TBL.029.MRC.01_cue_info.txt
 /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/lang_code_epo/N2.CLE.TBL.030.MRC.02_cue_info.txt
 /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/lang_code_epo/N2.CLE.TBL.031.MRC.03_cue_info.txt
