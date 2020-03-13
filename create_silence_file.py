@@ -53,6 +53,9 @@ silence_boundaries = sil.detect_silence(sound, min_silence_len=min_sil_len, sile
 
 # a file ready for import as labels by audacity
 outfile = open(args.lab, 'w', newline='')
+# add a header
+outfile.write("# (silence) regions where db<dBFS-"+str(decibels)+" and min_length="+str(min_sil_len/1000)+"\n")
+outfile.write("# start\tend\tindex: (duration)\n")
 tsv = csv.writer(outfile, delimiter='\t')
 
 line_inc=0
