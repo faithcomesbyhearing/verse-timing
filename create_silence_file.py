@@ -9,6 +9,7 @@ required_args.add_argument(
     '-i', required=True, nargs=1, type=str, help='Input audio file')
 
 # below 8,300 observed to well-correspond to line boundaries in B01___01_Matthew_____ENGESVN1DA.mp3
+# less so for B27___22_Revelation__ENGESVN1DA.mp3 1:30-3:00 (many extra silence periods)
 optional_args=parser.add_argument_group('optional arguments')
 optional_args.add_argument('-db', default=[8], nargs=1, type=int, help='Threshold decibel level')
 optional_args.add_argument('-sl', default=[300], nargs=1, type=int, help='Min. silence length(milli secs)')
@@ -47,10 +48,12 @@ if not(args.noheader):write_file.write('fileset,book,chapter,db,sId,sBegin,sEnd\
 sound = AudioSegment.from_mp3(input_file)
 dBFS = sound.dBFS
 silence_boundaries = sil.detect_silence(sound, min_silence_len=min_sil_len, silence_thresh=dBFS - decibels)
+# silence region seems to be determined by continuous region of power -db less than dBFS (relative to each file
+# should study the effect of music or not - possibly default db should depend on this?)
 
+# a file ready for import as labels by audacity
 outfile = open(args.lab, 'w', newline='')
 tsv = csv.writer(outfile, delimiter='\t')
-# a file ready for import as labels by audacity
 
 line_inc=0
 for boundaries in silence_boundaries:
@@ -59,6 +62,5 @@ for boundaries in silence_boundaries:
     write_file.write(file_setid + ',' + book_name + ',' + chapter_num + ',' + '-' + str(decibels)+',')
     write_file.write("{0},{1},{2}\n".format(line_inc,boundaries[0],boundaries[1]))
     tsv.writerow([boundaries[0],boundaries[1],str(line_inc)+": "+str(round(boundaries[1]-boundaries[0],2))])
-    # print("{0} {1} silence".format(boundaries[0],boundaries[1]))
 write_file.close()
 outfile.close()
