@@ -49,7 +49,7 @@ dBFS = sound.dBFS
 silence_boundaries = sil.detect_silence(sound, min_silence_len=min_sil_len, silence_thresh=dBFS - decibels)
 
 outfile = open(args.lab, 'w', newline='')
-tsv = csv.writer(outfile, delimiter='\t', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+tsv = csv.writer(outfile, delimiter='\t')
 # a file ready for import as labels by audacity
 
 line_inc=0
