@@ -21,6 +21,8 @@ The foll. cue info files are manually extracted from clt tool and written in tex
 /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/lang_code_epo/N2.CLE.TBL.043.MRC.15_cue_info.txt
 /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/lang_code_epo/N2.CLE.TBL.044.MRC.16_cue_info.txt
 
+Place the cue info. files in the output directory. Ex: /Users/spanta/Documents/FCBH_github/outputs
+
 
 Input files:
 ls /Users/spanta/Desktop/jon_code_test/new_files/drive-download-20200107T220609Z-001/Chinanteco_San_Juan_Lealao_N2CLETBL
