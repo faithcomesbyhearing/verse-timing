@@ -1,5 +1,6 @@
 # verse-timing
-Tools to determine the start time of verses in chapter audio files. Please install the required modules for the code to work. Will update the readme with list of modules to be installed. Python will notify about it if the code does not execute.
+Tools to determine the start time of verses in chapter audio files. Please install the required modules for the code to work. Will update the readme with list of modules to be installed. Python will notify about it if the code does not execute. 
+IDE: PyCharm Community Edition 2018.3 (Free) 
 
 Tested to work with exact command line arguments, input files naming convention on Mark gospel for Chinanteco and having line cue info markers text files as shown below. 
 
