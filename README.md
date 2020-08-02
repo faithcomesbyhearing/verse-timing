@@ -1,5 +1,7 @@
 # verse-timing
-Tools to determine the start time of verses in chapter audio files.Tested to work with exact command line arguments, input files naming convention on Mark gospel for Chinanteco and having line cue info markers text files as shown below. 
+Tools to determine the start time of verses in chapter audio files. Please install the required modules for the code to work. Will update the readme with list of modules to be installed. Python will notify about it if the code does not execute.
+
+Tested to work with exact command line arguments, input files naming convention on Mark gospel for Chinanteco and having line cue info markers text files as shown below. 
 
 The foll. cue info files are manually extracted from clt tool and written in text format. The compare_with_cue_info_chinanteco.py code wont run if it can't find these files in the output dir. Please unzip "Chinanteco_cue_info_text_files.zip" uploaded to github as below.  
 /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/lang_code_epo/N2.CLE.TBL.029.MRC.01_cue_info.txt
@@ -34,7 +36,8 @@ N2_CLE_TBL_0036_MRC_08.wav
 
 Example code to run Chinanteco. 
 
-python3 upload_code/create_lines_from_corescript_xls.py -i new_files/drive-download-20200107T220609Z-001/Chinanteco_San_Juan_Lealao_N2CLETBL/CORE_Scr_1059r_NT_1ENG__25_Rdr__Chinanteco_de_San_Juan_Lealao_N1_CLE_TBL.xls -o /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/chinanteco_lines.csv -book Mark 
+python3.7 /Users/spanta/Documents/FCBH_github/create_lines_from_corescript_xls.py -i /Users/spanta/Documents/FCBH_github/Chinanteco_inputs/CORE_Scr_1059r_NT_1ENG__25_Rdr__Chinanteco_de_San_Juan_Lealao_N1_CLE_TBL.xls -o /Users/spanta/Documents/FCBH_github/outputs/lines.csv -book Mark
+
 
 Info. about input arguments
 parser = argparse.ArgumentParser(
@@ -60,7 +63,8 @@ optional_args.add_argument('-line_pointer', nargs=1, type=str,default=['-2'],hel
 ------------------------
 
 
-python3 upload_code/create_aeneas.py -input_lines_csv /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/chinanteco_lines.csv -input_audio_dir /Users/spanta/Desktop/jon_code_test/new_files/drive-download-20200107T220609Z-001/Chinanteco_San_Juan_Lealao_N2CLETBL -output_dir upload_code/chinanteco_aeneas/lang_code_epo -language_code epo -sound_find_string MRC -move_adjustment -write_audition_format
+python3 /Users/spanta/Documents/FCBH_github/create_aeneas.py -input_lines_csv /Users/spanta/Documents/FCBH_github/outputs/lines.csv -input_audio_dir /Users/spanta/Documents/FCBH_github/Chinanteco_inputs -output_dir /Users/spanta/Documents/FCBH_github/outputs -language_code epo -sound_find_string MRC -move_adjustment -write_audition_format
+
 
 Info. about input arguments
 
@@ -89,8 +93,7 @@ optional_args.add_argument('-write_audition_format', action='store_true', help='
 
 ------------
 
-
-python3 upload_code/compare_with_cue_info_chinanteco.py -i /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/lang_code_epo -o /Users/spanta/Desktop/jon_code_test/upload_code/chinanteco_aeneas/ -book_find_string MRC -synced_silence -write_audition_format -print_chapter 3 -extract_verse_timing
+python3 /Users/spanta/Documents/FCBH_github/compare_with_cue_info_chinanteco.py -i /Users/spanta/Documents/FCBH_github/outputs -o /Users/spanta/Documents/FCBH_github/outputs -book_find_string MRC -synced_silence -write_audition_format -print_chapter 3 -extract_verse_timing
 
 Info. about input arguments
 
