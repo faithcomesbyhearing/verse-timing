@@ -217,7 +217,7 @@ def create_aeneas_csv(df=input_df,book_chapter_list=book_chapter_list,input_audi
                 missing.write(each_missing)
             missing.close()
 
-def extract_silence_intervals(input_file,output_file,decibels=10,min_sil_len=400):
+def extract_silence_intervals(input_file,output_file,decibels=16,min_sil_len=400):
     import pydub.silence as sil, os, re
     from pydub import AudioSegment
 
