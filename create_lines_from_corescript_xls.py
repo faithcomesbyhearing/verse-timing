@@ -31,9 +31,9 @@ optional_args.add_argument('-book', nargs=1, type=str,help='custom book.EX: Mark
 optional_args.add_argument('-book_chapter', nargs=1, type=str, default=['MATTHEW 1'],help='custom book chapter. Be sure to include the space. EX: John 9')
 optional_args.add_argument('-noheader', action='store_true', help='Remove header: fileset,book,chapter,db,sId,sBegin,sEnd')
 optional_args.add_argument('-find_string', nargs=1, type=str,default=['MATTHEW CHP 1'],help='string to find input langauge column index in corescript. Default:MATTHEW CHP 1')
-optional_args.add_argument('-target_pointer', nargs=1, type=str,default=['2'],help='Integer to add to input language column index to get target language in corescript. '
+optional_args.add_argument('-target_pointer', nargs=1, type=str,default=['1'],help='Integer to add to input language column index to get target language in corescript. '
                                                                                  'Default: find_string column index + 2')
-optional_args.add_argument('-line_pointer', nargs=1, type=str,default=['-2'],help='Integer to add to input language column index to get line number in corescript. '
+optional_args.add_argument('-line_pointer', nargs=1, type=str,default=['-3'],help='Integer to add to input language column index to get line number in corescript. '
                                                                                 'Default: find_string column index - 2')
 
 
@@ -46,7 +46,7 @@ fileset=args.fileset[0]
 core_script_sheet_name=args.sheetname[0]
 #if args.book_chapter is not None: book_chapter=args.book_chapter[0]
 if args.book is not None:
-    book=args.book[0]
+    book=(str(args.book[0])).lower()
 else:book=None
 find_string=args.find_string[0]
 # if args.target_pointer is not None:
@@ -60,7 +60,7 @@ line_gap_silence=0.5
 verses_split_string='-'
 chapter_find_string='CHP'
 
-write_file_handle=open(output_file,'w')
+write_file_handle=open(output_file,'w',encoding='utf-8')
 write_file = csv.writer(write_file_handle)
 # Write header as requested by user
 if not(args.noheader):write_file.writerow(('fileset','book','chapter','line_number', 'verse_number','verse_content','words','characters','postSilence_secs_cue','expected_post_silence_secs','do_not_combine_boolean_flag'))
@@ -210,8 +210,11 @@ def get_chapter_verses(language,input_book_chapter,output_book_chapter,target_la
 
         # Print line gap silence only if cue post silence is empty and if its last word(split by new line) in the line
         if i==len((script_df[target_column_name][line_start_index]).split('\n'))-1 and postSilence=='':
+            #word = word + '\n......\n......'
             write_string=[fileset, book, chapter, line_num, chapter_verse_num,word, word_count, character_count, postSilence,line_gap_silence,do_not_combine_boolean_flag]
+
         elif i==len((script_df[target_column_name][line_start_index]).split('\n'))-1 and postSilence!='':
+            #word = word + round(float(postSilence)/0.3) * '\n......'
             write_string = [fileset, book, chapter, line_num, chapter_verse_num, word, word_count, character_count, postSilence, '',
                             do_not_combine_boolean_flag]
         else:
@@ -219,7 +222,15 @@ def get_chapter_verses(language,input_book_chapter,output_book_chapter,target_la
                             '', do_not_combine_boolean_flag]
 
         if language == 'en':write_string = [str(i).encode("ascii", errors="ignore").decode() for i in write_string]
-        else:write_string = [str(i) for i in write_string]
+        else:
+            # write_string = [remove_accents(str(z).lower()) for z in write_string]
+            write_string = [remove_accents(str(z)) for z in write_string]
+            #write_string = [str(z).encode("ascii", errors="ignore").decode() for z in write_string]
+
+            write_string = [re.sub("⁰|¹|²|³|⁴|⁵|⁶|⁷|⁸|⁹", "", z) for z in write_string]
+            #write_string = [str(i) for i in write_string]
+
+
         if word.strip()!='':  write_file.writerow(write_string)
 
     # For each line in chapter process and print the same info. as above
@@ -255,15 +266,8 @@ def get_chapter_verses(language,input_book_chapter,output_book_chapter,target_la
         #Made sure that the word does not contain 12,000 or a number like that
         for i,check_word in enumerate(line_content):
             #Get verse numbers
-            if check_word.isdigit() and int(check_word) <= 119:
-                verse_number = int(check_word)
-                if verse_number>int(current_verse_num):
-                    verse_num_list.append(verse_number)
-                    verse_ind_list.append(i)
-                    current_verse_num=verse_number
-
             #Give verse begin , vend
-            elif re.search('{(.*)}', check_word) is not None:
+            if re.search('{(.*)}', check_word) is not None:
 
                 if (re.search('{(.*)}', check_word).group(1)).__contains__('}') or int((re.search('{(.*)}',check_word).group(1)).split(verses_split_string)[0])<=119:
 
@@ -277,28 +281,17 @@ def get_chapter_verses(language,input_book_chapter,output_book_chapter,target_la
                         verse_num_list.append(content.split('{')[-1])
                         verse_ind_list.append(i)
                         current_verse_num=content.split('{')[-1]
+                        if chapter == 1 and current_verse_num==40: print('1',current_verse_num)
 
                     else:
                         # print((re.search('{(.*)}', check_word).group(1)))
                         verse_num_list.append((re.search('{(.*)}', check_word).group(1)))
                         verse_ind_list.append(i)
                         current_verse_num=(re.search('{(.*)}', check_word).group(1))
+                        if chapter == 1 and current_verse_num==40: print('2', current_verse_num)
 
-
-            elif not(check_word.__contains__(',')) and re.search(r'\d+', check_word) is not None and int(re.search(r'\d+', check_word).group())<=119:
-
-                verse_number = int(re.search(r'\d+', check_word).group())
-                if verse_number >int(current_verse_num):
-                    verse_num_list.append(verse_number)
-                    verse_ind_list.append(i)
-                    current_verse_num=verse_number
-
-                # Append verse content
-                if current_verse_num not in verse_list_dict:verse_list_dict[current_verse_num]=list()
-                string_position_start=next(i for i,j in list(enumerate(check_word,1))[::-1] if j.isdigit())
-                verse_list_dict[current_verse_num].append(check_word[string_position_start:])
-                # print(line_num,verse_content,verse_num_list)
             elif i==0:
+                if chapter == 1 and current_verse_num==40: print('4', current_verse_num)
                 verse_num_list.append(current_verse_num)
 
                 # Append verse content
@@ -311,9 +304,13 @@ def get_chapter_verses(language,input_book_chapter,output_book_chapter,target_la
                 verse_list_dict[current_verse_num].append(check_word)
                 # print(line_num,verse_content,verse_num_list)
 
+
+
+
         #WRITING VERSE CONTENT
         for i,v in enumerate(verse_list_dict):
             verse_list_dict[v]=' '.join(verse_list_dict[v])
+            # verse_list_dict[v]=verse_list_dict[v]+'\n......\n......'
             word_count=len(verse_list_dict[v].split())
 
             alphabet_character_count = len([c for c in verse_list_dict[v] if c.isalpha()])
@@ -330,10 +327,16 @@ def get_chapter_verses(language,input_book_chapter,output_book_chapter,target_la
             if i!=0: do_not_combine_boolean_flag=''
             # Print line gap silence only if cue post silence is empty and if its last verse in the line
             if i==len(verse_list_dict)-1 and postSilence=='':
+
+                verse_list_dict[v] = verse_list_dict[v] + '\n......\n......'
+
                 write_string = [fileset, book, chapter, line_num, v, verse_list_dict[v], word_count, character_count,
                                 postSilence,line_gap_silence,
                                 do_not_combine_boolean_flag]
             elif i==len(verse_list_dict)-1 and postSilence!='':
+
+                verse_list_dict[v] = verse_list_dict[v] + round(float(postSilence)/0.3) * '\n......'
+
                 write_string = [fileset, book, chapter, line_num, v, verse_list_dict[v], word_count, character_count,
                                 postSilence, '',
                                 do_not_combine_boolean_flag]
@@ -341,9 +344,26 @@ def get_chapter_verses(language,input_book_chapter,output_book_chapter,target_la
                                  '','',
                             do_not_combine_boolean_flag]
             if language == 'en':
-                write_string = [str(i).encode("ascii", errors="ignore").decode() for i in write_string]
+                write_string = [str(z).encode("ascii", errors="ignore").decode() for z in write_string]
+                # print(type(write_string))
+                #re.sub("⁰|¹|²|³|⁴|⁵|⁶|⁷|⁸|⁹", "", write_string)
+
             else:
-                write_string = [str(i) for i in write_string]
+                # write_string = [remove_accents(str(z).lower()) for z in write_string]
+                write_string = [remove_accents(str(z)) for z in write_string]
+                #write_string = [str(z).encode("ascii", errors="ignore").decode() for z in write_string]
+
+                write_string = [re.sub("⁰|¹|²|³|⁴|⁵|⁶|⁷|⁸|⁹", "", z) for z in write_string]
+
+                #print(write_string)
+
+                #write_string = [str(z) for z in write_string]
+                # print(type(write_string))
+
+                #re.sub("⁰|¹|²|³|⁴|⁵|⁶|⁷|⁸|⁹", "", write_string)
+
+                #write_string = [str(z).encode("ascii", errors="ignore").decode() for z in write_string]
+
             if (verse_list_dict[v]).strip()!='': write_file.writerow(write_string)
 
 
@@ -355,24 +375,50 @@ def get_chapter_verses(language,input_book_chapter,output_book_chapter,target_la
 
 line_column_index,input_language_column_index,target_language_column_index,script_df=get_column_indexes_from_corescript()
 # print(line_column_index,input_language_column_index,target_language_column_index)
-print("line_column_name:{0},input_language_column_name:{1},target_language_column_name:{2}".format(script_df.columns[line_column_index],script_df.columns[input_language_column_index],script_df.columns[target_language_column_index]))
+#print("line_column_name:{0},input_language_column_name:{1},target_language_column_name:{2}".format(script_df.columns[line_column_index],script_df.columns[input_language_column_index],script_df.columns[target_language_column_index]))
 
 language,complete_book_chapters_list=get_book_chapters_list(chapter_find_string,input_language_column_index,target_language_column_index,script_df)
 language,book_chapters_list=get_book_chapters_list(chapter_find_string,input_language_column_index,target_language_column_index,script_df,book)
 
+'''
 print(complete_book_chapters_list)
 print(book_chapters_list)
 print(language)
+'''
 
 last_chapter_index=[i+1 for i, x in enumerate(complete_book_chapters_list) if x==book_chapters_list[len(book_chapters_list)-1]][0]
 
+# import unicodedata
+# myfoo = u'àà'
+# unicodedata.normalize('NFD', myfoo).encode('ascii', 'ignore')
+
+import sys
+if sys.version_info.major == 3:
+    unicode = str
+
+def remove_accents(string):
+    if type(string) is not unicode:
+        string = unicode(string, encoding='utf-8')
+
+    string = re.sub(u"[Äàáâãäå]", 'a', string)
+    string = re.sub(u"[èéêë]", 'e', string)
+    string = re.sub(u"[ìíîïɨ]", 'i', string)
+    string = re.sub(u"[òóôõö]", 'o', string)
+    string = re.sub(u"[ùúûü]", 'u', string)
+    string = re.sub(u"[ýÿ]", 'y', string)
+    string = re.sub(u"[¿]", '', string)
+
+    return string
+
+
 for i,book in enumerate(book_chapters_list):
-    print(book)
+    #print(book)
     if i != len(book_chapters_list) - 1:
         get_chapter_verses(language, book, book_chapters_list[i + 1], target_language_column_index, script_df)
     else:
         if book is None:
             get_chapter_verses(language, book, 'REVELATION CHP 23', target_language_column_index, script_df)
         else:
+            #get_chapter_verses(language, book, 'REVELATION CHP 23', target_language_column_index, script_df)
             get_chapter_verses(language, book, complete_book_chapters_list[last_chapter_index], target_language_column_index, script_df)
 write_file_handle.close()
