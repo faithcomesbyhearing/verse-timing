@@ -1,4 +1,9 @@
 # verse-timing
+
+
+
+
+
 Tools to determine the start time of verses in chapter audio files. Please install the required modules for the code to work. Download the requirements.txt file from this repo and do : pip install -r requirements.txt
 IDE Used: PyCharm Community Edition 2018.3 (Free) 
 
