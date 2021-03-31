@@ -6,6 +6,8 @@ from collections import OrderedDict
 from scipy.stats import mstats
 import pathlib
 
+#If 95% of lines abs(cuedur-aeneasdur) is >3 then flag the data
+qc_threshold_secs=3
 
 #Make sure for chinanteco line comparison the cue info first liine is taken care of
 
@@ -182,7 +184,11 @@ qc_df=(pd.read_csv(qc_filename, encoding='utf-8'))
 sorted_values=(qc_df.sort_values(by=['abs(cuedur-aeneasdur)']))['abs(cuedur-aeneasdur)']
 quantiles = mstats.mquantiles(sorted_values, axis=0)
 
-qcout_filename=   os.path.join(output_dir,'_'.join((aeneas_dir.replace('/','_')).split('_')[-2:])+'_95%QC_value.txt')
+if np.quantile(sorted_values, 0.95, axis=0)>qc_threshold_secs:
+    qcout_filename=   os.path.join(output_dir,'_'.join((aeneas_dir.replace('/','_')).split('_')[-2:])+'_95%QC_value_flagged.txt')
+else:
+    qcout_filename = os.path.join(output_dir,
+                                  '_'.join((aeneas_dir.replace('/', '_')).split('_')[-2:]) + '_95%QC_value.txt')
 
 with open(qcout_filename, 'w') as file:
     file.write(str(np.quantile(sorted_values, 0.95, axis=0)))
