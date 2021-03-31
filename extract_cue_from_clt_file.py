@@ -24,8 +24,6 @@ read_file=open(input_file,'r')
 write_file=open(output_file,'w')
 
 
-# Write header
-if not(args.noheader):write_file.write('fileset,book,chapter,line,qtime\n')
 
 #Fill the header values and overwrite custom option
 filename=input_file.split('/')[-1]
@@ -42,6 +40,7 @@ lines=read_file.readlines()
 bits_per_second=float((lines[2]).strip())
 
 start_time_id=3
+duration_id=4
 line_number_id=5
 increment=5
 '''IMPL the cues in core script are recorded in the clt as cue 01 for mat 24
@@ -50,11 +49,13 @@ In core script it says +2 secs, its duration in clt is 1.66 secs'''
 while line_number_id<=len(lines):
 
     start_time=round(float(lines[start_time_id].strip())/bits_per_second,3)
+    end_time=round( (float(lines[start_time_id].strip()) +float(lines[duration_id].strip()) ) /bits_per_second,3)
     line_audio_file = (lines[line_number_id]).strip()
     line_number=(re.compile('\_+').split(line_audio_file.split('.')[0]))[-1]
-    write_file.write(file_setid + ',' + book_name + ',' + chapter_num +',')
-    write_file.write(str(line_number)+','+str(start_time)+'\n')
+    if line_number.__contains__('ue')==False:
+        write_file.write(str(start_time)+'\t'+str(end_time)+'\t'+str(int(line_number))+'\n')
     start_time_id+=increment
+    duration_id += increment
     line_number_id+=increment
 
 read_file.close()
