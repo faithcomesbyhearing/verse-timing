@@ -46,11 +46,12 @@ if args.sound_find_string is not None: sound_find_string=args.sound_find_string[
 
 file_name='aeneas.csv'
 output_file=os.path.join(output_dir,file_name)
-write_file_handle=open(output_file,'a+',encoding='utf-8')
-write_file = csv.writer(write_file_handle)
+
 
 # Write header as requested by user
 if not(args.noheader) and not(os.path.isfile(output_file)):
+    write_file_handle = open(output_file, 'a+', encoding='utf-8')
+    write_file = csv.writer(write_file_handle)
     write_file.writerow(('fileset','book','chapter','line_number', 'verse_number','verse_content','time'))
 
 
@@ -75,7 +76,7 @@ def get_chapters_index(df):
 
 input_df=(pd.read_csv(input_file, encoding='utf-8')).astype(str)
 if args.book_chapter is not None:
-    book_chapter_list=[args.book_chapter[0]]
+    book_chapter_list=[(str(args.book_chapter[0])).replace(' ','_')]
 else:
     book_chapter_list=get_chapters_index(input_df)
 print(book_chapter_list)
@@ -366,5 +367,6 @@ def adjust_update_boundaries_with_silence(input_file,silence_file,output_file,ve
         )
 
 
-create_aeneas_csv()
+create_aeneas_csv(input_df,book_chapter_list,input_audio_dir)
+#create_aeneas_csv()
 

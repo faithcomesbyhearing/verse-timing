@@ -114,7 +114,7 @@ if len(glob.glob(input_dir+'/*manual*timings*'))!=0:
 elif len(glob.glob(input_dir+'/*.clt')) !=0 :
     for input_file in glob.glob(input_dir+'/*.clt'):
 
-        print(input_file)
+        #print(input_file)
 
         # Open read and write files
         read_file=open(input_file,'r')

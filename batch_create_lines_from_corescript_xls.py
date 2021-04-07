@@ -407,6 +407,7 @@ if not (args.noheader): write_file.writerow(('fileset', 'book', 'chapter', 'line
 core_script_df = load_excel_file(input_file)
 if core_script_df.columns[1]=='book':
 
+    core_script_df[(core_script_df.iloc[:, 1].str).contains('Opt-') == False]
     book_chapter_df=core_script_df['book']+' '+ core_script_df['chapter']
     a=book_chapter_df.values.tolist()
 
