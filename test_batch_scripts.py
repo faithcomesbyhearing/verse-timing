@@ -58,7 +58,7 @@ for i,row in merged_df.iterrows():
         corescripts_location = os.path.join(corescripts_dir, filesetid, script)
 
 
-        extract_lines_from_corescript_execstring = 'python3 /Users/spanta/Desktop/adapted_for_batch/batch_create_lines_from_corescript_xls.py ' + \
+        extract_lines_from_corescript_execstring = 'python3 batch_create_lines_from_corescript_xls.py ' + \
                                                   ' -core_script ' + corescripts_location + \
                                                   ' -o ' + tmp_location + ' -book_chapter ' + '\'MAT 1\''
         print(extract_lines_from_corescript_execstring)
@@ -108,7 +108,9 @@ for i,row in merged_df.iterrows():
         '''
 
         create_dirs([os.path.join(qinfo_dir,filesetid)])
-        filesetid_qinfo_dir=os.path.join(qinfo_dir,filesetid)
+
+        stocknum = str(row['stocknumber']).replace('/','')
+        filesetid_qinfo_dir=os.path.join(qinfo_dir,stocknum)
 
         extract_line_from_clt_string='python3 /Users/spanta/Desktop/adapted_for_batch/batch_extract_cue_from_clt_file.py ' \
                                      '-i ' + filesetid_qinfo_dir+\
