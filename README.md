@@ -125,3 +125,5 @@ optional_args.add_argument('-print_chapter', nargs=1, type=str,default=['9'],hel
 optional_args.add_argument('-write_audition_format', action='store_true', help='Write output to audition tab csv format')
 optional_args.add_argument('-check_secs', nargs=1, type=str,default=['3'],help='Mark if above check secs')
 
+batch_create_lines_from_db_bible_verses.py:Added feature to create verse timings from bible_verses from DB
+Bible verses do not have chapter headings. So I transcribe the audio file and extract the text using silence regions to fill the chapter headings.
