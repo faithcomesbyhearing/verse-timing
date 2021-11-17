@@ -10,7 +10,7 @@ batch*.py scripts are used to run the code through a list of given langauges,fil
 2)Extract verse timings using aeneas package in adobe audtion format
 3)Extract line and verse timings in SAB format
 4)Extract line timnings from .clt files(qinfo)
-5)Compute quality control metric by comparing the line timings computed using the aeneas process vs line timings from qinfo
+5)Compute quality control metric by comparing the line timings computed using the aeneas process vs line timings from qinfo, to ,make sure its within reasonable agreement. The qinfo files : line timings are only used as a method for Quality control rather than extracting verse timings from them because they may not reflect the latest edits done by the audio processing team. Hence the audio and qinfo line timings may not match up as expected. We use aeneas package to extract verse boundaries.
 6)Upload timnings to Database and create hls streams
 
 
