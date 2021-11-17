@@ -1,11 +1,20 @@
 # verse-timing
 
 
-
-
-
 Tools to determine the start time of verses in chapter audio files. Please install the required modules for the code to work. Download the requirements.txt file from this repo and do : pip install -r requirements.txt
 IDE Used: PyCharm Community Edition 2018.3 (Free) 
+
+
+batch*.py scripts are used to run the code through a list of given langauges,filsetids,corescripts,qinfo files. They run the following code:
+1)Extract lines and verses from corescript
+2)Extract verse timings using aeneas package in adobe audtion format
+3)Extract line and verse timings in SAB format
+4)Extract line timnings from .clt files(qinfo)
+5)Compute quality control metric by comparing the line timings computed using the aeneas process vs line timings from qinfo
+6)Upload timnings to Database and create hls streams
+
+
+The following info. is related to running code specific to a language. Ex: Chinanteco. The batch code is being updated to accomodate new use cases as each language has various new cases it presents: ex: Differences in core script text, parsing different columns, non-standard naming conventions, parsing verse numbers with various wild cards, chapter headings, naming conventions of audio files, Database entries etc. 
 
 Tested to work with exact command line arguments, input files naming convention on Mark gospel for Chinanteco and having line cue info markers text files as shown below. 
 
