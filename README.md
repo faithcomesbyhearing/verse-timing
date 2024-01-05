@@ -1,5 +1,90 @@
 # verse-timing
 
+Aeneas Algorithm
+The way aeneas works is to synthesize each phrase using a text-to-speech engine, and then compare the synthesized audio files against the input audio file to find the phrase breaks. To do this, a lot of clever mathematical computation goes on behind the scenes: Using the Sakoe-Chiba Band Dynamic Time Warping (DTW) algorithm to align the Mel-frequency cepstral coefficients (MFCCs) representation of the given (real) audio wave and the audio wave obtained by synthesizing the text fragments with a TTS engine, eventually mapping the computed alignment back onto the (real) time domain.
+
+
+https://github.com/readbeyond/aeneas/blob/master/wiki/HOWITWORKS.md
+
+compute MFCC from real and synthesized audio
+Next, we compute an abstract matrix representation for each of the two audio signals R and S, called Mel-frequency cepstral coefficients (MFCC).
+The MFCC capture the overall "shape" of the audio signal, neglecting local details like the color of the voice.
+After this step, we have two new objects:
+the MFCC_R matrix, of size (k, n), containing the MFCC coefficients for the real audio file R;
+the MFCC_S matrix, of size (k, m), containing the MFCC coefficients for the synthesized audio file S.
+Each column of the matrix, also called frame, corresponds to a sub-interval of the audio file, all with the same length, for example 40 milliseconds. So, if the audio file R has length 10 seconds, MFCC_R will have 250 columns, the first corresponding to the interval between 0.000 and 0.040, the second corresponding to the interval [0.040, 0.080], and so on. Since in general the audio files R and S have different lengths, the corresponding MFCC_R and MFCC_S matrices will have a different number of columns, let's say n and m respectively.
+Both matrices have k rows, each representing one MFCC coefficient. The first coefficient (row 0) of each frame represents the spectral log power of the audio in that frame.
+For both R and S, we can map a time instant in the audio file to the corresponding frame index in MFCC_R or MFCC_S. Moreover, we can map back a frame index in MFCC_R or MFCC_S to the corresponding interval in R or S.
+compute DTW
+The next step consists in computing the DTW between the two MFCC matrices.
+First, a cost matrix COST of size (n, m) is computed by taking the dot product * of the two MFCC matrices:
+COST[i][j] = MFCC_R[:][i] * MFCC_S[:][j]
+
+Then, the DTW algorithm is run over the cost matrix to find the minimum cost path transforming S into R.
+Since computing this algorithm over the full matrix would be too expensive, requiring space (memory) and time Theta(nm), only a stripe (band) around the main diagonal is computed, and the DTW path is constrained to stay inside this stripe. The width d of the stripe, the so-called margin, is a parameter adjusting the tradeoff between the "quality" of the approximation produced and the space/time Theta(nd) to produce it.
+
+This approach is called Sakoe-Chiba Band (approximation of the exact) Dynamic Time Warping, because, in general, the produced path is not the minimum cost path, but only an approximation of it. However, given the particular structure of the forced alignment task, the Sakoe-Chiba approximation often returns the optimal solution, when the margin d is set suitably large to "absorb" the variation of speed between the real audio and the synthesized audio, but small enough to make the computation fast enough.
+The output of this step is a synt-frame-index-to-real-frame-index map M2, which associates a column index in MFCC_R to each column index in MFCC_S. In other words, it maps the synthesized time domain back onto the real time domain. In our example:
+M2 = [
+    0  -> 10
+    1  -> 11
+    2  -> 12
+    3  -> 14
+    ...
+    15 -> 66
+    16 -> 67
+    ...
+    m  -> n
+]
+
+Thanks to the implicit frame-index-to-audio-time correspondence, the M2 map can be viewed as mapping intervals in the synthesized audio into intervals of the real audio:
+M2 = [
+    [0.000, 0.040] -> [0.000, 0.440]
+    [0.040, 0.080] -> [0.480, 0.520]
+    [0.080, 0.120] -> [0.520, 0.560]
+    [0.120, 0.160] -> [0.600, 0.640]
+    ...
+    [0.600, 0.640] -> [2.640, 2.680]
+    [0.640, 0.680] -> [2.680, 2.720]
+    ...
+]
+
+Step 5: mapping back to the real time domain
+The last step consists in composing the two maps M2 and M1, obtaining the desired map M that associates each text fragment f to the corresponding interval in the real audio file:
+M[f] = [ M2[(M1[f].begin)].begin, M2[(M1[f].end)].begin ]
+
+Continuing our example, for the first text fragment we have:
+f      = f_1                # "Sonnet 1"
+
+M1[f]  = [0.000, 0.638]     # in the synthesized audio
+       = [0, 15]            # as MFCC_S indices
+
+M2[0]  = 0                  # as MFCC_R index
+       = [0.000, 0.040]     # as interval in the real audio
+M2[15] = 66                 # as MFCC_R index
+       = [2.640, 2.680]     # as interval in the real audio
+
+M[f_1] = [0.000, 2.640]     # in the real audio
+
+Repeating the above for each fragment, we obtain the map M for the entire text:
+M = [
+    "Sonnet I"                                       -> [ 0.000,  2.640]
+    "From fairest creatures we desire increase,"     -> [ 2.640,  5.880]
+    "That thereby beauty's rose might never die,"    -> [ 5.880,  9.240]
+    "But as the riper should by time decease,"       -> [ 9.240, 11.920]
+    "His tender heir might bear his memory:"         -> [11.920, 15.280]
+    ...
+    "To eat the world's due, by the grave and thee." -> [48.080, 53.240]
+]
+
+
+NOTE: The final output map M has time values which are multiples of the MFCC frame size (MFCC window shift), for example 40 milliseconds in the example above. This effect is due to the discretization of the audio signal. The user can reduce this effect by setting a smaller MFCC window shift, say to 5 milliseconds, at the cost of increasing the demand of computation resources (memory and time). The default settings of aeneas are fine for aligning audio and text when the text fragments have paragraph, sentence, or sub-sentence granularity. For word-level granularity, the user might want to decrease the MFCC window shift parameter. Please consult the Command Line Tutorial in the documentation for further advice.
+
+https://rtavenar.github.io/hdr/parts/01/dtw.html
+https://pyts.readthedocs.io/en/stable/auto_examples/metrics/plot_sakoe_chiba.html
+
+
+
 
 Tools to determine the start time of verses in chapter audio files. Please install the required modules for the code to work. Download the requirements.txt file from this repo and do : pip install -r requirements.txt
 IDE Used: PyCharm Community Edition 2018.3 (Free) 
