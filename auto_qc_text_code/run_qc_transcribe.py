@@ -16,7 +16,7 @@ model_id = "facebook/mms-lid-4017"
 processor = AutoFeatureExtractor.from_pretrained(model_id)
 model = Wav2Vec2ForSequenceClassification.from_pretrained(model_id)
 
-audio_dir='/Users/spanta/Downloads/FCBH_QC_MMS/test_tugutil/'
+audio_dir='/xyz/'
 lines_csv_file='lines.csv'
 #Number of audio files to use for identifying language iso code
 num_audiofiles=10
@@ -142,7 +142,7 @@ for audio_fp in glob.glob(audio_dir+'/*/*.wav'):
     #Get source text from lines.csv
     line_number = (''.join((audio_fp.split(sub1)[-1].split(sub2)[0]).split(sub3)[0])).split('r')[0]
     # text=list(df[df['line_number']==line_number]['line_content'])[0]
-    text = list(updated_lines_df[updated_lines_df['line_number'] == int(line_number)]['line_content'])[0]
+    text = list(updated_lines_df[updated_lines_df['line_number'] == str(line_number)]['line_content'])[0]
     normalized_text=normalize_text(text,lang_code)
     print('original_text:', normalized_text)
 
